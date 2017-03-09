@@ -1,5 +1,5 @@
 {-# OPTIONS_GHC -Wall #-}
-{-# LANGUAGE DeriveDataTypeable #-}
+{-# LANGUAGE DeriveFunctor,DeriveFoldable,DeriveTraversable,DeriveGeneric,DeriveDataTypeable #-}
 -----------------------------------------------------------------------------
 -- |
 -- Module      :  Data.ExtendedReal
@@ -36,6 +36,7 @@ module Data.ExtendedReal
 import Prelude hiding (isInfinite)
 import Control.DeepSeq
 import Data.Data
+import Data.Binary
 import Data.Hashable
 import GHC.Generics
 import Data.Typeable
@@ -45,8 +46,9 @@ data Extended r
   = NegInf    -- ^ negative infinity (-∞)
   | Finite !r -- ^ finite value
   | PosInf    -- ^ positive infinity (+∞)
-  deriving (Ord, Eq, Show, Read, Typeable, Data,Generic)
+  deriving (Ord, Eq, Show, Foldable,Traversable,Read, Typeable, Data,Generic)
 
+instance Binary r => Binary (Extended r) where
 instance Bounded (Extended r) where
   minBound = NegInf
   maxBound = PosInf
