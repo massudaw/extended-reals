@@ -5,7 +5,7 @@
 -- Module      :  Data.ExtendedReal
 -- Copyright   :  (c) Masahiro Sakai 2014
 -- License     :  BSD-style
--- 
+--
 -- Maintainer  :  masahiro.sakai@gmail.com
 -- Stability   :  provisional
 -- Portability :  non-portable (DeriveDataTypeable)
@@ -37,6 +37,7 @@ import Prelude hiding (isInfinite)
 import Control.DeepSeq
 import Data.Data
 import Data.Hashable
+import GHC.Generics
 import Data.Typeable
 
 -- | @Extended r@ is an extension of /r/ with positive/negative infinity (±∞).
@@ -44,7 +45,7 @@ data Extended r
   = NegInf    -- ^ negative infinity (-∞)
   | Finite !r -- ^ finite value
   | PosInf    -- ^ positive infinity (+∞)
-  deriving (Ord, Eq, Show, Read, Typeable, Data)
+  deriving (Ord, Eq, Show, Read, Typeable, Data,Generic)
 
 instance Bounded (Extended r) where
   minBound = NegInf
@@ -72,13 +73,15 @@ inf = PosInf
 isFinite :: Extended r -> Bool
 isFinite (Finite _) = True
 isFinite _ = False
+{-# INLINE isFinite #-}
 
 -- | @isInfinite x@ returns @True@ iff @x@ is @PosInf@ or @NegInf@.
 isInfinite :: Extended r -> Bool
 isInfinite = not . isFinite
+{-# INLINE isInfinite #-}
 
 -- | Note that @Extended r@ is /not/ a field, nor a ring.
--- 
+--
 -- @PosInf + NegInf@ is left undefined as usual,
 -- but we define @0 * PosInf = 0 * NegInf = 0@ by following the convention of probability or measure theory.
 instance (Num r, Ord r) => Num (Extended r) where
@@ -109,7 +112,7 @@ instance (Num r, Ord r) => Num (Extended r) where
   signum (Finite x) = Finite (signum x)
   signum PosInf = Finite 1
 
-  fromInteger = Finite . fromInteger  
+  fromInteger = Finite . fromInteger
 
 -- | Note that @Extended r@ is /not/ a field, nor a ring.
 instance (Fractional r, Ord r) => Fractional (Extended r) where
